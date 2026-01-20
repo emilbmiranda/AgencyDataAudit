@@ -11,21 +11,6 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-builder.Services.AddCors(options =>
-{
-    var list = builder.Configuration.GetSection("cors:urls").Get<List<string>>();
-    if (list != null)
-    {
-        options.AddPolicy(name: MyAllowSpecificOrigins,
-                     policy =>
-                     {
-                         policy.WithOrigins(list?.ToArray());
-                     });
-    }
-
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,13 +27,11 @@ else
 
 app.UseHttpsRedirection();
 
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(AgencyDataAudit.Client._Imports).Assembly);
-app.UseCors(MyAllowSpecificOrigins);
 
 app.Run();
