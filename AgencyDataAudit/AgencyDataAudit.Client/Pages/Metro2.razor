@@ -1,0 +1,140 @@
+@using System.Net.Http
+@using System.Net.Http.Json
+@using System.ComponentModel;
+@using System.Globalization;
+@using Microsoft.AspNetCore.Components.Forms
+
+@page "/Metro2"
+
+<PageTitle>Metro2</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Metro 2</MudText>
+<MudText Typo="Typo.body1" Class="mb-8">Monthly data from our system of records</MudText>
+
+@if (reportingPeriods == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudSelect @bind-Value="selectedReportingPeriod" @bind-Value:after="GetMetro2" Label="Select Reporting Period" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary">
+        @foreach (ReportingPeriodData item in reportingPeriods) {
+            <MudSelectItem Value="@item">@item.ActivityDate</MudSelectItem>
+        }
+    </MudSelect>
+}
+
+@if (metro2s != null)
+{
+  <MudTable Items="metro2s" Hover="true" SortLabel="Sort By" Elevation="0" AllowUnsorted="false">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Metro2Data, object>(x=>x.FirstName)">First Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Metro2Data, object>(x=>x.LastName)">Last Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Metro2Data, object>(x=>x.AccountNumber)">Account Number</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+            <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+            <MudTd DataLabel="Account Number">@context.AccountNumber</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20, 50, 100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private ReportingPeriodData[]? reportingPeriods;
+    private ReportingPeriodData? selectedReportingPeriod { get; set; }
+    private Metro2Data[]? metro2s;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient httpClient = new HttpClient();
+        using var response = await httpClient.GetAsync("http://localhost:5127/ReportingPeriod/");
+        if (!response.IsSuccessStatusCode)
+            {
+                // set error message for display, log to console and return
+                errorMessage = response.ReasonPhrase;
+                Console.WriteLine($"There was an error! {errorMessage}");
+                return;
+            }
+
+        // convert http response data to UsersResponse object
+        reportingPeriods = await response.Content.ReadFromJsonAsync<ReportingPeriodData[]>();
+    } 
+
+    protected async Task GetMetro2()
+    {
+        HttpClient httpClient = new HttpClient();
+        using var response = await httpClient.GetAsync($"http://localhost:5127/Metro2/{selectedReportingPeriod?.ReportingPeriodId}");
+        if (!response.IsSuccessStatusCode)
+            {
+                // set error message for display, log to console and return
+                errorMessage = response.ReasonPhrase;
+                Console.WriteLine($"There was an error! {errorMessage}");
+                return;
+            }
+
+        // convert http response data to UsersResponse object
+        metro2s = await response.Content.ReadFromJsonAsync<Metro2Data[]>();
+    }
+
+    static readonly bool _reportingPeriodConverterRegistered = RegisterReportingPeriodConverter();
+
+    public static bool RegisterReportingPeriodConverter()
+    {
+        System.ComponentModel.TypeDescriptor.AddAttributes(
+            typeof(ReportingPeriodData),
+            new System.ComponentModel.TypeConverterAttribute(typeof(ReportingPeriodDataConverter))
+        );
+        return true;
+    }
+
+    public class ReportingPeriodDataConverter : System.ComponentModel.TypeConverter
+    {
+        public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)
+            => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+
+        public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
+        {
+            if (value is string s)
+                return new ReportingPeriodData { ActivityDate = s };
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Type? destinationType)
+            => destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
+
+        public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value, System.Type destinationType)
+        {
+            if (destinationType == typeof(string) && value is ReportingPeriodData rp)
+                return rp.ActivityDate;
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+    }
+
+    private class Metro2Data
+    {
+        public long Metro2Id { get; set; }
+
+        public long ReportingPeriodFileId { get; set; }
+
+        public string FirstName { get; set; } = null!;
+
+        public string LastName { get; set; } = null!;
+
+        public string AccountNumber { get; set; } = null!;
+    }
+
+    [TypeConverter(typeof(ReportingPeriodDataConverter))]
+    private class ReportingPeriodData
+    {
+        public long ReportingPeriodId { get; set; }
+
+        public long SystemOfRecordId { get; set; }
+
+        public string ActivityDate { get; set; }
+    }
+}
