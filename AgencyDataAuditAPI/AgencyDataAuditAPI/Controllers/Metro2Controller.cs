@@ -18,6 +18,13 @@ public class Metro2Controller(IMetro2Service metro2Service) : ControllerBase
         return result;
     }
 
+    [HttpGet("GetMetro2Trending/{systemOfRecordId}", Name = "GetMetro2Trending")]
+    public async Task<IEnumerable<Metro2Trending>> GetTrending(int systemOfRecordId)
+    {
+        var result = await Metro2Service.GetMetro2TrendingAsync(systemOfRecordId);
+        return result;
+    } 
+
     [HttpGet("{reportingPeriodId}/{account}", Name = "GetMetro2ByAccount")]
     public async Task<Metro2> GetAccount(int reportingPeriodId, string account)
     {

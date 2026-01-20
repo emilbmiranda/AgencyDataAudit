@@ -1,59 +1,62 @@
-﻿@page "/"
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using System.ComponentModel;
+@using System.Globalization;
+
+@page "/"
 
 <PageTitle>Home</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor and the .NET 9 Template!</MudText>
+@if (_series != null)
+{
+    <MudText Typo="Typo.h3" GutterBottom="true">Credova Metro 2 Trending</MudText>
+    <MudText Typo="Typo.body1" Class="mb-8">From Last 12 Months</MudText>
+    <MudPaper Class="doc-section-component-container">
+        <MudChart ChartType="ChartType.Line" ChartSeries="@_series" @bind-SelectedIndex="_index" XAxisLabels="@_xAxisLabels" Width="@_width" Height="@_height" ChartOptions="@_options" AxisChartOptions="_axisChartOptions" />
+    </MudPaper>
+}
 
-<MudAlert Severity="Severity.Normal" ContentAlignment="HorizontalAlignment.Start">
-    You can find documentation and examples on our website here:
-    <MudLink Href="https://mudblazor.com" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        <b>www.mudblazor.com</b>
-    </MudLink>
-</MudAlert>
+@code {
+    private int _index = -1; //default value cannot be 0 -> first selectedindex is 0.
+    private ChartOptions _options = new ChartOptions();
+    private AxisChartOptions _axisChartOptions = new AxisChartOptions();
+    private string _width = "975px";
+    private string _height = "525px";
+    private List<ChartSeries> _series = new List<ChartSeries>();
+    private string[] _xAxisLabels = new string[12];
+    private string? errorMessage;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient httpClient = new HttpClient();
+        using var response = await httpClient.GetAsync("http://localhost:5127/Metro2/GetMetro2Trending/1");
+        if (!response.IsSuccessStatusCode)
+            {
+                // set error message for display, log to console and return
+                errorMessage = response.ReasonPhrase;
+                Console.WriteLine($"There was an error! {errorMessage}");
+                return;
+            }
 
-<br />
-<MudText Typo="Typo.h5" GutterBottom="true">Interactivity in this Template</MudText>
-<br />
-<MudText Typo="Typo.body2">
-    When you opt for the "Global" Interactivity Location, <br />
-    the render modes are defined in App.razor and consequently apply to all child components.<br />
-    In this case, providers are globally set in the MainLayout.<br />
-    <br />
-    On the other hand, if you choose the "Per page/component" Interactivity Location,<br />
-    it is necessary to include the <br />
-    <br />
-    &lt;MudPopoverProvider /&gt; <br />
-    &lt;MudDialogProvider /&gt; <br />
-    &lt;MudSnackbarProvider /&gt; <br />
-    <br />
-    components on every interactive page.<br />
-    <br />
-    If a render mode is not specified for a page, it defaults to Server-Side Rendering (SSR),<br />
-    similar to this page. While MudBlazor allows pages to be rendered in SSR,<br />
-    please note that interactive features, such as buttons and dropdown menus, will not be functional.
-</MudText>
+        var metro2Trending = await response.Content.ReadFromJsonAsync<Metro2Trending[]>();
+        var recordCountData = new List<double>();
+        var xAxisLabels = new List<string>(); 
+        foreach (var m2t in metro2Trending)
+        {
+            recordCountData.Add((double)m2t.RecordCount);
+            xAxisLabels.Add(m2t.ActivityDate);
+        }
+        var chartSeries = new ChartSeries() {
+            Name = "Credova", Data = recordCountData.ToArray(), 
+        };
+        _series.Add(chartSeries);
+        _xAxisLabels = xAxisLabels.ToArray();
+    } 
 
-<br />
-<MudText Typo="Typo.h5" GutterBottom="true">What's New in Blazor with the Release of .NET 9</MudText>
-<br />
+    private class Metro2Trending
+    {
+        public string ActivityDate { get; set; }
 
-<MudText Typo="Typo.h6" GutterBottom="true">Prerendering</MudText>
-<MudText Typo="Typo.body2" GutterBottom="true">
-    If you're exploring the features of .NET 9 Blazor,<br /> you might be pleasantly surprised to learn that each page is prerendered on the server,<br /> regardless of the selected render mode.<br /><br />
-    This means that you'll need to inject all necessary services on the server,<br /> even when opting for the wasm (WebAssembly) render mode.<br /><br />
-    This prerendering functionality is crucial to ensuring that WebAssembly mode feels fast and responsive,<br /> especially when it comes to initial page load times.<br /><br />
-    For more information on how to detect prerendering and leverage the RenderContext, you can refer to the following link:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issuecomment-1783568121" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
-</MudText>
-
-<br />
-<MudText Typo="Typo.h6" GutterBottom="true">InteractiveAuto</MudText>
-<MudText Typo="Typo.body2">
-    A discussion on how to achieve this can be found here:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issue-1950424116" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
-</MudText>
+        public long RecordCount { get; set; }
+    }
+}
