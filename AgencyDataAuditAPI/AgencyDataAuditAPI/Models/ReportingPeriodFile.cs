@@ -27,7 +27,7 @@ public partial class ReportingPeriodFile
 
     public virtual ICollection<Metro2> Metro2s { get; set; } = new List<Metro2>();
 
-    public virtual ReportingPeriod ReportingPeriodFileNavigation { get; set; } = null!;
+    public virtual ReportingPeriod ReportingPeriod { get; set; } = null!;
 
     public virtual ICollection<Statistic> Statistics { get; set; } = new List<Statistic>();
 }

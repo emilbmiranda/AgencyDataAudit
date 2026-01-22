@@ -15,7 +15,7 @@ public partial class ReportingPeriod
 
     public bool IsActive { get; set; }
 
-    public virtual ReportingPeriodFile? ReportingPeriodFile { get; set; }
+    public virtual ICollection<ReportingPeriodFile> ReportingPeriodFiles { get; set; } = new List<ReportingPeriodFile>();
 
     public virtual SystemOfRecord SystemOfRecord { get; set; } = null!;
 }

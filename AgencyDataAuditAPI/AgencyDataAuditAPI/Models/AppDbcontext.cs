@@ -38,7 +38,7 @@ public partial class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=localhost;User ID=sa;Password=reallyStrongPwd123;Pooling=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Authentication=SqlPassword;Application Name=vscode-mssql;Application Intent=ReadWrite;Command Timeout=30");
+        => optionsBuilder.UseSqlServer("Data Source=localhost;User ID=sa;Password=reallyStrongPwd123;Trust Server Certificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -135,7 +135,6 @@ public partial class AppDbContext : DbContext
         {
             entity.ToTable("ReportingPeriodFile");
 
-            entity.Property(e => e.ReportingPeriodFileId).ValueGeneratedOnAdd();
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.Filename).IsUnicode(false);
 
@@ -153,8 +152,8 @@ public partial class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFile_FileType");
 
-            entity.HasOne(d => d.ReportingPeriodFileNavigation).WithOne(p => p.ReportingPeriodFile)
-                .HasForeignKey<ReportingPeriodFile>(d => d.ReportingPeriodFileId)
+            entity.HasOne(d => d.ReportingPeriod).WithMany(p => p.ReportingPeriodFiles)
+                .HasForeignKey(d => d.ReportingPeriodId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportingPeriodFile_ReportingPeriod");
         });
