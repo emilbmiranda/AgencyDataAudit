@@ -48,7 +48,7 @@ public class Metro2Service : IMetro2Service
     public async Task<List<Metro2>> GetMetro2sAsync(int reportingPeriodId)
     {
         
-        var rpf = await _context.ReportingPeriodFiles.Where(m => m.ReportingPeriodId == reportingPeriodId).FirstOrDefaultAsync();
+        var rpf = await _context.ReportingPeriodFiles.Where(m => m.ReportingPeriodId == reportingPeriodId && m.FileTypeId == 1).FirstOrDefaultAsync();
         var metro2s = await _context.Metro2s.Where(m => m.ReportingPeriodFileId == rpf.ReportingPeriodFileId).ToListAsync();
         return metro2s;
     }
@@ -70,7 +70,7 @@ public class Metro2Service : IMetro2Service
     }
     public async Task<Metro2> GetMetro2AccountAsync(int reportingPeriodId, string account)
     {
-        var rpf = await _context.ReportingPeriodFiles.Where(m => m.ReportingPeriodId == reportingPeriodId).FirstOrDefaultAsync();
+        var rpf = await _context.ReportingPeriodFiles.Where(m => m.ReportingPeriodId == reportingPeriodId && m.FileTypeId == 1).FirstOrDefaultAsync();
         var metro2 = await _context.Metro2s.FirstOrDefaultAsync(m => m.ReportingPeriodFileId == rpf.ReportingPeriodFileId && m.AccountNumber == account);
         return metro2;
     }

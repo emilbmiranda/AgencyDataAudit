@@ -1,0 +1,171 @@
+@using System.Net.Http
+@using System.Net.Http.Json
+@using System.ComponentModel;
+@using System.Globalization;
+@using Microsoft.AspNetCore.Components.Forms
+
+@page "/Stats"
+
+<PageTitle>Stats</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Stats</MudText>
+<MudText Typo="Typo.body1" Class="mb-8">Monthly comparison of Metro2 and Consumer Reporting Agency data</MudText>
+
+@if (reportingPeriods == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudSelect @bind-Value="selectedReportingPeriod" @bind-Value:after="GetStatisticComparison" Label="Select Reporting Period" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary">
+        @foreach (ReportingPeriodData item in reportingPeriods) {
+            <MudSelectItem Value="@item">@item.ActivityDate</MudSelectItem>
+        }
+    </MudSelect>
+}
+
+@if (statisticComparisonData != null)
+{
+    <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="2">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 150px;">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Metro2 Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@Metro2RecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(EquifaxRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Equifax Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@EquifaxRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(ExperianRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Experian Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@ExperianRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(InnovisRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Innovis Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@InnovisRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(TransUnionRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                    <MudText Typo="Typo.h6" GutterBottom="true">TransUnion Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@TransUnionRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+}
+
+@code {
+    private ReportingPeriodData[]? reportingPeriods;
+    private ReportingPeriodData? selectedReportingPeriod { get; set; }
+    private StatisticComparisonData[]? statisticComparisonData;
+    private long? Metro2RecordCount;
+    private long? EquifaxRecordCount;
+    private long? ExperianRecordCount;
+    private long? InnovisRecordCount;
+    private long? TransUnionRecordCount;
+    private bool EquifaxRule;
+    private bool ExperianRule;
+    private bool InnovisRule;
+    private bool TransUnionRule;    
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient httpClient = new HttpClient();
+        using var response = await httpClient.GetAsync("http://localhost:5127/ReportingPeriod/");
+        if (!response.IsSuccessStatusCode)
+            {
+                // set error message for display, log to console and return
+                errorMessage = response.ReasonPhrase;
+                Console.WriteLine($"There was an error! {errorMessage}");
+                return;
+            }
+
+        // convert http response data to UsersResponse object
+        reportingPeriods = await response.Content.ReadFromJsonAsync<ReportingPeriodData[]>();
+    } 
+
+    protected async Task GetStatisticComparison()
+    {
+        statisticComparisonData = null;
+        HttpClient httpClient = new HttpClient();
+        using var response = await httpClient.GetAsync($"http://localhost:5127/Statistic/{selectedReportingPeriod?.ReportingPeriodId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            // set error message for display, log to console and return
+            errorMessage = response.ReasonPhrase;
+            Console.WriteLine($"There was an error! {errorMessage}");
+            return;
+        }
+
+        statisticComparisonData = await response.Content.ReadFromJsonAsync<StatisticComparisonData[]>();
+        Metro2RecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Metro2").RecordCount;
+        EquifaxRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Equifax").RecordCount;
+        ExperianRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Experian").RecordCount;
+        InnovisRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Innovis").RecordCount;
+        TransUnionRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "TransUnion").RecordCount;
+        EquifaxRule = Metro2RecordCount == EquifaxRecordCount;
+        ExperianRule = Metro2RecordCount == ExperianRecordCount;
+        InnovisRule = Metro2RecordCount == InnovisRecordCount;
+        TransUnionRule = Metro2RecordCount == TransUnionRecordCount;
+    }
+
+    private class StatisticComparisonData
+    {
+        public string Source { get; set; }
+
+        public long RecordCount { get; set; }
+    }
+
+    static readonly bool _reportingPeriodConverterRegistered = RegisterReportingPeriodConverter();
+
+    public static bool RegisterReportingPeriodConverter()
+    {
+        System.ComponentModel.TypeDescriptor.AddAttributes(
+            typeof(ReportingPeriodData),
+            new System.ComponentModel.TypeConverterAttribute(typeof(ReportingPeriodDataConverter))
+        );
+        return true;
+    }
+
+    public class ReportingPeriodDataConverter : System.ComponentModel.TypeConverter
+    {
+        public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Type sourceType)
+            => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+
+        public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
+        {
+            if (value is string s)
+                return new ReportingPeriodData { ActivityDate = s };
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Type? destinationType)
+            => destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
+
+        public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value, System.Type destinationType)
+        {
+            if (destinationType == typeof(string) && value is ReportingPeriodData rp)
+                return rp.ActivityDate;
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+    }
+
+    [TypeConverter(typeof(ReportingPeriodDataConverter))]
+    private class ReportingPeriodData
+    {
+        public long ReportingPeriodId { get; set; }
+
+        public long SystemOfRecordId { get; set; }
+
+        public string ActivityDate { get; set; }
+    }
+}

@@ -44,7 +44,7 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<ConsumerReportingAgency>(entity =>
         {
-            entity.HasKey(e => e.ConsumerReportingAgencyIdId);
+            entity.HasKey(e => e.ConsumerReportingAgencyId);
 
             entity.ToTable("ConsumerReportingAgency");
 

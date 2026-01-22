@@ -5,7 +5,7 @@ namespace AgencyDataAuditAPI.Models;
 
 public partial class ConsumerReportingAgency
 {
-    public long ConsumerReportingAgencyIdId { get; set; }
+    public long ConsumerReportingAgencyId { get; set; }
 
     public string Name { get; set; } = null!;
 
