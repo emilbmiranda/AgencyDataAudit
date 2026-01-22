@@ -9,22 +9,49 @@
 
 @if (_series != null)
 {
-    <MudText Typo="Typo.h3" GutterBottom="true">Credova Metro 2 Trending</MudText>
-    <MudText Typo="Typo.body1" Class="mb-8">From Last 12 Months</MudText>
-    <MudPaper Class="doc-section-component-container">
-        <MudChart ChartType="ChartType.Line" ChartSeries="@_series" @bind-SelectedIndex="_index" XAxisLabels="@_xAxisLabels" Width="@_width" Height="@_height" ChartOptions="@_options" AxisChartOptions="_axisChartOptions" />
-    </MudPaper>
+    <MudText Typo="Typo.h3" GutterBottom="true">Credova Dashboard</MudText>
+    <MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 125px;">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Current Month's Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@currentMonthRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 125px;">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Previous Month's Record Count</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@previousMonthRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="4">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 125px;">
+                    <MudText Typo="Typo.h6" GutterBottom="true">Monthly Average</MudText>
+                    <MudText Typo="Typo.h4" GutterBottom="true">@averageRecordCount</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" sm="12" md="8">
+                <MudPaper Elevation="2" Class="pa-4" Style="height: 575px;">
+                    <MudChart ChartType="ChartType.Line" ChartSeries="@_series" @bind-SelectedIndex="_index" XAxisLabels="@_xAxisLabels" Width="@_width" Height="@_height" ChartOptions="@_options" AxisChartOptions="_axisChartOptions" />
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
 }
 
 @code {
     private int _index = -1; //default value cannot be 0 -> first selectedindex is 0.
     private ChartOptions _options = new ChartOptions();
     private AxisChartOptions _axisChartOptions = new AxisChartOptions();
-    private string _width = "975px";
-    private string _height = "525px";
+    private string _width = "950px";
+    private string _height = "475px";
     private List<ChartSeries> _series = new List<ChartSeries>();
     private string[] _xAxisLabels = new string[12];
     private string? errorMessage;
+    private long? currentMonthRecordCount;
+    private long? previousMonthRecordCount;
+    private double? averageRecordCount;
+
     
     protected override async Task OnInitializedAsync()
     {
@@ -51,6 +78,9 @@
         };
         _series.Add(chartSeries);
         _xAxisLabels = xAxisLabels.ToArray();
+        currentMonthRecordCount = metro2Trending.Last().RecordCount;
+        previousMonthRecordCount = metro2Trending.Reverse().Skip(1).Take(1).FirstOrDefault().RecordCount;
+        averageRecordCount = Math.Round(metro2Trending.Select(m => m.RecordCount).Average(), 2);
     } 
 
     private class Metro2Trending
