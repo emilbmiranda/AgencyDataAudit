@@ -17,7 +17,7 @@
 }
 else
 {
-    <MudSelect @bind-Value="selectedReportingPeriod" @bind-Value:after="GetStatisticComparison" Label="Select Reporting Period" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary">
+    <MudSelect @bind-Value="selectedReportingPeriod" @bind-Value:after="GetStatisticComparison" Label="Select Reporting Period" OpenIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="Color.Secondary" FitContent="true">
         @foreach (ReportingPeriodData item in reportingPeriods) {
             <MudSelectItem Value="@item">@item.ActivityDate</MudSelectItem>
         }
@@ -35,25 +35,25 @@ else
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="2">
-                <MudPaper Elevation="2" Class="pa-4" Style="@(EquifaxRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(EquifaxRule ? $"height: 150px; color: color:{Theme.PaletteLight.Dark}; background:{Colors.Green.Lighten3};" : $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Red.Lighten3};")">
                     <MudText Typo="Typo.h6" GutterBottom="true">Equifax Record Count</MudText>
                     <MudText Typo="Typo.h4" GutterBottom="true">@EquifaxRecordCount</MudText>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="2">
-                <MudPaper Elevation="2" Class="pa-4" Style="@(ExperianRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(ExperianRule ? $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Green.Lighten3};" : $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Red.Lighten3};")">
                     <MudText Typo="Typo.h6" GutterBottom="true">Experian Record Count</MudText>
                     <MudText Typo="Typo.h4" GutterBottom="true">@ExperianRecordCount</MudText>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="2">
-                <MudPaper Elevation="2" Class="pa-4" Style="@(InnovisRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(InnovisRule ? $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Green.Lighten3};" : $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Red.Lighten3};")">
                     <MudText Typo="Typo.h6" GutterBottom="true">Innovis Record Count</MudText>
                     <MudText Typo="Typo.h4" GutterBottom="true">@InnovisRecordCount</MudText>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" sm="6" md="2">
-                <MudPaper Elevation="2" Class="pa-4" Style="@(TransUnionRule ? $"height: 150px; background:{Colors.Green.Lighten3};" : $"height: 150px; background:{Colors.Red.Lighten3};")">
+                <MudPaper Elevation="2" Class="pa-4" Style="@(TransUnionRule ? $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Green.Lighten3};" : $"height: 150px; color:{Theme.PaletteLight.Dark}; background:{Colors.Red.Lighten3};")">
                     <MudText Typo="Typo.h6" GutterBottom="true">TransUnion Record Count</MudText>
                     <MudText Typo="Typo.h4" GutterBottom="true">@TransUnionRecordCount</MudText>
                 </MudPaper>
@@ -63,6 +63,7 @@ else
 }
 
 @code {
+    private MudTheme Theme = new MudTheme();
     private ReportingPeriodData[]? reportingPeriods;
     private ReportingPeriodData? selectedReportingPeriod { get; set; }
     private StatisticComparisonData[]? statisticComparisonData;

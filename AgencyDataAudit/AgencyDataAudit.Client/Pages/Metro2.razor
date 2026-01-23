@@ -17,7 +17,7 @@
 }
 else
 {
-    <MudSelect @bind-Value="selectedReportingPeriod" @bind-Value:after="GetMetro2" Label="Select Reporting Period" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary">
+    <MudSelect @bind-Value="selectedReportingPeriod" @bind-Value:after="GetMetro2" Label="Select Reporting Period" OpenIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="Color.Secondary" FitContent="true">
         @foreach (ReportingPeriodData item in reportingPeriods) {
             <MudSelectItem Value="@item">@item.ActivityDate</MudSelectItem>
         }
