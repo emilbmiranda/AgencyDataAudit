@@ -18,6 +18,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<ConsumerReportingAgency> ConsumerReportingAgencies { get; set; }
 
+    public virtual DbSet<Error> Errors { get; set; }
+
     public virtual DbSet<ErrorCategory> ErrorCategories { get; set; }
 
     public virtual DbSet<FileState> FileStates { get; set; }
@@ -44,13 +46,26 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<ConsumerReportingAgency>(entity =>
         {
-            entity.HasKey(e => e.ConsumerReportingAgencyId);
-
             entity.ToTable("ConsumerReportingAgency");
 
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Error>(entity =>
+        {
+            entity.ToTable("Error");
+
+            entity.HasOne(d => d.ErrorCategory).WithMany(p => p.Errors)
+                .HasForeignKey(d => d.ErrorCategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Error_ErrorCategory");
+
+            entity.HasOne(d => d.ReportingPeriodFile).WithMany(p => p.Errors)
+                .HasForeignKey(d => d.ReportingPeriodFileId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Error_ReportingPeriodFile");
         });
 
         modelBuilder.Entity<ErrorCategory>(entity =>
@@ -59,10 +74,9 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("ErrorCategory");
 
-            entity.Property(e => e.ErrorCategory1)
+            entity.Property(e => e.ErrorCategoryName)
                 .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("ErrorCategory");
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<FileState>(entity =>

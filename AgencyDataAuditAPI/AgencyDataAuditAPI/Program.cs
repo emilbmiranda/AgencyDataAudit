@@ -32,6 +32,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<AgencyDataAuditAPI.Services.IMetro2Service, AgencyDataAuditAPI.Services.Metro2Service>();
 builder.Services.AddScoped<AgencyDataAuditAPI.Services.IReportingPeriodService, AgencyDataAuditAPI.Services.ReportingPeriodService>();
 builder.Services.AddScoped<AgencyDataAuditAPI.Services.IStatisticService, AgencyDataAuditAPI.Services.StatisticService>();
+builder.Services.AddScoped<AgencyDataAuditAPI.Services.IErrorService, AgencyDataAuditAPI.Services.ErrorService>();
 
 var app = builder.Build();
 

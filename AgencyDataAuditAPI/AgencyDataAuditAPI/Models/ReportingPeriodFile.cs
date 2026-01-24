@@ -21,6 +21,8 @@ public partial class ReportingPeriodFile
 
     public virtual ConsumerReportingAgency? ConsumerReportingAgency { get; set; }
 
+    public virtual ICollection<Error> Errors { get; set; } = new List<Error>();
+
     public virtual FileState FileState { get; set; } = null!;
 
     public virtual FileType FileType { get; set; } = null!;
