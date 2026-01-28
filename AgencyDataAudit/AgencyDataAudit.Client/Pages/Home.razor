@@ -66,12 +66,17 @@
             }
 
         var metro2Trending = await response.Content.ReadFromJsonAsync<Metro2Trending[]>();
+        if (metro2Trending == null)
+            return;
         var recordCountData = new List<double>();
         var xAxisLabels = new List<string>(); 
         foreach (var m2t in metro2Trending)
         {
             recordCountData.Add((double)m2t.RecordCount);
-            xAxisLabels.Add(m2t.ActivityDate);
+            if (m2t.ActivityDate != null)
+            {
+                xAxisLabels.Add(m2t.ActivityDate);
+            }
         }
         var chartSeries = new ChartSeries() {
             Name = "Credova", Data = recordCountData.ToArray(), 
@@ -79,13 +84,14 @@
         _series.Add(chartSeries);
         _xAxisLabels = xAxisLabels.ToArray();
         currentMonthRecordCount = metro2Trending.Last().RecordCount;
-        previousMonthRecordCount = metro2Trending.Reverse().Skip(1).Take(1).FirstOrDefault().RecordCount;
+        var previousMonth = metro2Trending.Reverse().Skip(1).Take(1).FirstOrDefault();
+        previousMonthRecordCount = previousMonth?.RecordCount;
         averageRecordCount = Math.Round(metro2Trending.Select(m => m.RecordCount).Average(), 2);
     } 
 
     private class Metro2Trending
     {
-        public string ActivityDate { get; set; }
+        public string? ActivityDate { get; set; }
 
         public long RecordCount { get; set; }
     }

@@ -108,11 +108,11 @@ else
         }
 
         statisticComparisonData = await response.Content.ReadFromJsonAsync<StatisticComparisonData[]>();
-        Metro2RecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Metro2").RecordCount;
-        EquifaxRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Equifax").RecordCount;
-        ExperianRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Experian").RecordCount;
-        InnovisRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "Innovis").RecordCount;
-        TransUnionRecordCount = statisticComparisonData.FirstOrDefault(m => m.Source == "TransUnion").RecordCount;
+        Metro2RecordCount = statisticComparisonData?.FirstOrDefault(m => m.Source == "Metro2")?.RecordCount;
+        EquifaxRecordCount = statisticComparisonData?.FirstOrDefault(m => m.Source == "Equifax")?.RecordCount;
+        ExperianRecordCount = statisticComparisonData?.FirstOrDefault(m => m.Source == "Experian")?.RecordCount;
+        InnovisRecordCount = statisticComparisonData?.FirstOrDefault(m => m.Source == "Innovis")?.RecordCount;
+        TransUnionRecordCount = statisticComparisonData?.FirstOrDefault(m => m.Source == "TransUnion")?.RecordCount;
         EquifaxRule = Metro2RecordCount == EquifaxRecordCount;
         ExperianRule = Metro2RecordCount == ExperianRecordCount;
         InnovisRule = Metro2RecordCount == InnovisRecordCount;
@@ -121,7 +121,7 @@ else
 
     private class StatisticComparisonData
     {
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
         public long RecordCount { get; set; }
     }
@@ -152,7 +152,7 @@ else
         public override bool CanConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Type? destinationType)
             => destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
 
-        public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value, System.Type destinationType)
+        public override object? ConvertTo(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, System.Type destinationType)
         {
             if (destinationType == typeof(string) && value is ReportingPeriodData rp)
                 return rp.ActivityDate;
@@ -167,6 +167,6 @@ else
 
         public long SystemOfRecordId { get; set; }
 
-        public string ActivityDate { get; set; }
+        public string? ActivityDate { get; set; }
     }
 }

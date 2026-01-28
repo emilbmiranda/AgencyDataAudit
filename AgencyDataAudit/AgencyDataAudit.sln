@@ -6,10 +6,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgencyDataAudit", "AgencyDa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgencyDataAudit.Client", "AgencyDataAudit.Client\AgencyDataAudit.Client.csproj", "{9D17DFFA-1F3A-42F0-A6B8-1D684547D037}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgencyDataAudit.Tests", "AgencyDataAudit.Tests\AgencyDataAudit.Tests.csproj", "{A1234567-B8C9-4D2E-9F1A-2B3C4D5E6F7A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgencyDataAudit.Client.Tests", "AgencyDataAudit.Client.Tests\AgencyDataAudit.Client.Tests.csproj", "{B2345678-C9D0-4E3F-A0B2-3C4D5E6F7A8B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

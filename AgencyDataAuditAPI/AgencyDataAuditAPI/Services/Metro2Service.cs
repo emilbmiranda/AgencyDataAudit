@@ -32,7 +32,7 @@ namespace AgencyDataAuditAPI.Services;
 public interface IMetro2Service
 {
     Task<List<Metro2>> GetMetro2sAsync(int reportingPeriodId);
-     Task<List<Metro2Trending>> GetMetro2TrendingAsync(int systemOfRecordId);
+    Task<List<Metro2Trending>> GetMetro2TrendingAsync(int systemOfRecordId);
     Task<Metro2> GetMetro2AccountAsync(int reportingPeriodId, string account);
 }
 
