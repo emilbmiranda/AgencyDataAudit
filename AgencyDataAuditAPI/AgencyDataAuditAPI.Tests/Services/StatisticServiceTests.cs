@@ -63,7 +63,25 @@ namespace AgencyDataAuditAPI.Tests.Services
                 ConsumerReportingAgencyId = 1,
                 Name = "Equifax"
             };
+            var consumerReportingAgency2 = new ConsumerReportingAgency()
+            {
+                ConsumerReportingAgencyId = 2,
+                Name = "Experian"
+            };
+            var consumerReportingAgency3 = new ConsumerReportingAgency()
+            {
+                ConsumerReportingAgencyId = 3,
+                Name = "Innovis"
+            };
+            var consumerReportingAgency4 = new ConsumerReportingAgency()
+            {
+                ConsumerReportingAgencyId = 4,
+                Name = "TransUnion"
+            };
             await _context.ConsumerReportingAgencies.AddAsync(consumerReportingAgency);
+            await _context.ConsumerReportingAgencies.AddAsync(consumerReportingAgency2);
+            await _context.ConsumerReportingAgencies.AddAsync(consumerReportingAgency3);
+            await _context.ConsumerReportingAgencies.AddAsync(consumerReportingAgency4);
             await _context.ReportingPeriods.AddAsync(reportingPeriod);
             await _context.ReportingPeriodFiles.AddAsync(reportingPeriodFile);
             await _context.ReportingPeriodFiles.AddAsync(reportingPeriodFile2);
